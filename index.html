@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<div class="jumbotron">
+  <h1 class="display-4">Pokemon Gif AJAX Call</h1>
+  <h5 class="lead">Click on some of my Favorite Pokemon listed in the buttons shown. If you want to add another just type a name in and see what comes up. Gifs will list out below - each set of gifs assocaited with the word you choose will appear after the gifs choosen previously.  There is a total of 10 gifs per choosen word. Have Fun!</h5>
+  <div id="buttons-view"></div>
+  <form id="gif-form">
+      <label for="gif-input"></label>
+      <input type="text" id="gif-input"><br>
+      <input id="add-gif" type="button" class="btn btn-danger" type="submit" value="Find Another Pokemon">
+    </form>
+</div>
+
+  <div class="container">
+    <div id = "gif-images"></div>
+   
+    <style>
+
+    p{
+      color: white;
+      background-color: black;
+      margin-right: 675px;
+
+    }
+    h1 {
+      font-family: 'pokemon-font', monospace;
+    }
+
+    h5 {
+      font-family: 'pokemon-font', monospace;
+    }
+    #gif-input {
+      margin-left: 750px;
+      margin-top: -220px;
+
+    }
+
+    #add-gif {
+      margin-left: 750px;
+      margin-top: 20px;
+    }
+
+
+    #gif-images {
+      margin-top: 70px;
+    }  
+    
+    body{
+      background-image: url("images/background_Image.png");
+    }
+
+    #gif-form{
+      margin-top: 50px;
+    }
+
+    .jumbotron {
+      background-image: url("images/backroung_image2.jpg");
+      height: 300px;
+    }
+
+    .lead {
+      margin-left: 200px;
+      color: black;
+      margin-top: 20px;
+    }
+
+    .display-4 {
+      margin-left: 460px;
+      color:black;
+    
+    }
+
+    </style>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      var topics = ["Pikachu", "Snorlax", "Charizard", "Squirtle", "Mew", "Bulbasaur"];
+     
+      function displayGifs() {
+        var topic = $(this).attr("data-name");
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic + "&api_key=GCQMs1dgaFc5eRxKO0FBGmhw5lFc6jql&limit=10";
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).then(function(response) {
+          console.log(response);
+          
+          for(var i = 0; i < 10; i++) {
+          var apipull = response.data[i];  
+         
+          var Rating = apipull.rating;
+          var searchDiv = $("<div>");
+          var p = $("<p>"); 
+
+          var Gifs = $("<img>").attr("src", apipull.images.downsized_still.url);
+          Gifs.attr("data-still", apipull.images.downsized_still.url);
+          Gifs.attr("data-animate", apipull.images.downsized.url);
+
+          p.html("Rating: " + Rating);
+          $(p).appendTo(searchDiv); 
+          $(Gifs).appendTo(searchDiv);
+          $(searchDiv).appendTo("#gif-images");
+
+          $(Gifs).on("click", function() {
+            var state = $(this).attr('data-state');
+
+            if(state === 'still'){
+              $(this).attr('src',$(this).attr('data-animate'));
+              $(this).attr('data-state', 'animate'); }            
+                else {
+                   $(this).attr('src',$(this).attr('data-still'))
+                   $(this).attr('data-state', 'still');
+            }
+          
+
+
+          })
+       
+          }
+        });
+        
+      }
+      function renderButtons() {
+        $("#buttons-view").empty();
+        for (var i = 0; i < topics.length; i++) {
+        var a = $("<button type=button class=btn btn-success>Success </button>");
+          a.addClass("topic");
+          a.attr("data-name", topics[i]);
+          a.text(topics[i]);
+          $("#buttons-view").append(a);
+        }
+      }
+     
+      $("#add-gif").on("click", function(event) {
+        event.preventDefault();
+        var topic = $("#gif-input").val().trim();
+        topics.push(topic);
+        renderButtons();
+      });
+    
+      $(document).on("click", ".topic", displayGifs);
+      renderButtons();
+    </script>
+  </div>
+</body>
+</html>
